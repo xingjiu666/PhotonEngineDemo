@@ -34,26 +34,26 @@
             :max="item.max"
             :step="item.step || 1"
             style="width: 200px"
-            @change="(val: number) => updateConfig(key, val)"
+            @update:model-value="(val: number) => updateConfig(key, val)"
           />
           <!-- 颜色 -->
           <el-color-picker
             v-else-if="item.type === 'color'"
             :model-value="(currentConfig[key] as string) ?? item.default"
-            @change="(val: string | null) => updateConfig(key, val)"
+            @update:model-value="(val: string | null) => updateConfig(key, val)"
           />
           <!-- 布尔 -->
           <el-switch
             v-else-if="item.type === 'boolean'"
             :model-value="(currentConfig[key] as boolean) ?? item.default"
-            @change="(val: boolean) => updateConfig(key, val)"
+            @update:model-value="(val: boolean) => updateConfig(key, val)"
           />
           <!-- 选择 -->
           <el-select
             v-else-if="item.type === 'select'"
             :model-value="(currentConfig[key] as string) ?? item.default"
             style="width: 160px"
-            @change="(val: string) => updateConfig(key, val)"
+            @update:model-value="(val: string) => updateConfig(key, val)"
           >
             <el-option
               v-for="opt in item.options"
