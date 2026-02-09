@@ -1,0 +1,44 @@
+{
+  "name": "photon-engine-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PhotonEngine SDK 功能演示",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "electron:dev": "vite --mode electron",
+    "electron:build": "vite build && electron-builder",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.0",
+    "@photon-engine/capture": "^1.1.0",
+    "@photon-engine/comm": "^1.1.0",
+    "@photon-engine/core": "^1.1.0",
+    "@photon-engine/electron": "^1.1.0",
+    "@photon-engine/hef": "^1.1.0",
+    "element-plus": "^2.9.0",
+    "vue": "^3.5.0",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0",
+    "node-hid": "^3.1.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.3.0",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.0",
+    "vue-tsc": "^2.2.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild",
+      "node-hid",
+      "vue-demi"
+    ]
+  }
+}

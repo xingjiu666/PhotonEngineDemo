@@ -1,0 +1,5 @@
+ignoredBuiltDependencies:
+  - electron
+  - esbuild
+  - node-hid
+  - vue-demi
