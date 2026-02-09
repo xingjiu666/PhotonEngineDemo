@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Refresh, Monitor } from '@element-plus/icons-vue';
-import { getEngine, type EffectMeta } from '@/engine';
+import { getEngine, saveState, type EffectMeta } from '@/engine';
 
 interface ScreenSource {
   id: string;
@@ -90,6 +90,7 @@ async function selectEffect(effect: EffectMeta) {
   currentEffectId.value = effect.id;
   await engine.setEffect(effect.id);
   engine.play();
+  saveState();
 }
 </script>
 

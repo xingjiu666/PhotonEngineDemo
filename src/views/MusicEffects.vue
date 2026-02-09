@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { Refresh } from '@element-plus/icons-vue';
-import { getEngine, type EffectMeta } from '@/engine';
+import { getEngine, saveState, type EffectMeta } from '@/engine';
 
 interface AudioDevice {
   id: string;
@@ -102,6 +102,7 @@ async function selectEffect(effect: EffectMeta) {
     },
   });
   engine.play();
+  saveState();
 }
 
 function onColorModeChange() {

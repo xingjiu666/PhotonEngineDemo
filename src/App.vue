@@ -64,7 +64,7 @@ import { useRoute } from 'vue-router';
 import { Brush, Headset, Monitor, Picture, Connection, Cpu } from '@element-plus/icons-vue';
 import PlayControls from './components/PlayControls.vue';
 import EffectPreview from './components/EffectPreview.vue';
-import { getEngine } from './engine';
+import { getEngine, initEngine } from './engine';
 
 const route = useRoute();
 const activeMenu = computed(() => route.path);
@@ -72,7 +72,10 @@ const deviceCount = ref(0);
 
 let unsubDevice: (() => void) | null = null;
 
-onMounted(() => {
+onMounted(async () => {
+  // 初始化引擎并恢复上次的灯效/播放状态
+  await initEngine();
+
   unsubDevice = getEngine().onDeviceChange((devices) => {
     deviceCount.value = devices.length;
   });

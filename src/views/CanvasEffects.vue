@@ -69,42 +69,76 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { getEngine, type EffectMeta } from '@/engine';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { getEngine, saveState, type EffectMeta } from '@/engine';
 
 const engine = getEngine();
 const effects = ref<EffectMeta[]>([]);
 const currentEffectId = ref('');
 const currentConfig = ref<Record<string, unknown>>({});
 
+// 缓存每个灯效的用户配置，切换后不丢失
+const configCache = new Map<string, Record<string, unknown>>();
+
 const currentDetail = computed(() => {
   if (!currentEffectId.value) return null;
   return engine.getEffectDetail(currentEffectId.value);
 });
 
+let unsubState: (() => void) | null = null;
+
 onMounted(() => {
   effects.value = engine.getEffectsByCategory('canvas' as any);
 
-  // 默认选中第一个
+  // 同步引擎当前状态（可能是恢复的）
+  unsubState = engine.subscribe((state) => {
+    if (state.effectId && state.effectId !== currentEffectId.value) {
+      // 引擎灯效变了（比如从其他页面切换过来），同步到本页
+      const isCanvasEffect = effects.value.some((e) => e.id === state.effectId);
+      if (isCanvasEffect) {
+        currentEffectId.value = state.effectId;
+        currentConfig.value = { ...state.effectConfig };
+        configCache.set(state.effectId, { ...state.effectConfig });
+      }
+    }
+  });
+
+  // 如果引擎已有当前灯效（恢复的），读取它
   const cur = engine.getCurrentEffect();
   if (cur) {
-    currentEffectId.value = cur.id;
-    currentConfig.value = cur.config;
-  } else if (effects.value.length > 0) {
-    selectEffect(effects.value[0]);
+    const isCanvasEffect = effects.value.some((e) => e.id === cur.id);
+    if (isCanvasEffect) {
+      currentEffectId.value = cur.id;
+      currentConfig.value = { ...cur.config };
+      configCache.set(cur.id, { ...cur.config });
+    }
   }
 });
 
+onUnmounted(() => {
+  unsubState?.();
+});
+
 async function selectEffect(effect: EffectMeta) {
+  // 保存当前灯效的配置
+  if (currentEffectId.value) {
+    configCache.set(currentEffectId.value, { ...currentConfig.value });
+  }
+
   currentEffectId.value = effect.id;
-  const defaults = engine.getEffectDefaultConfig(effect.id);
-  currentConfig.value = { ...defaults };
+
+  // 优先使用缓存的配置，没有则用默认值
+  const cached = configCache.get(effect.id);
+  currentConfig.value = cached ? { ...cached } : { ...engine.getEffectDefaultConfig(effect.id) };
+
   await engine.setEffect(effect.id, currentConfig.value);
   engine.play();
+  saveState();
 }
 
 function updateConfig(key: string, value: unknown) {
   currentConfig.value = { ...currentConfig.value, [key]: value };
+  configCache.set(currentEffectId.value, { ...currentConfig.value });
   engine.updateEffectConfig({ [key]: value });
 }
 </script>
